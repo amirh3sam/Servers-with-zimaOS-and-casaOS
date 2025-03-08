@@ -25,6 +25,9 @@ Each system has its own advantages:
 
 This guide is designed for beginners with minimal technical knowledge. We'll cover installation and basic configuration on different hardware platforms.
 
+![Comparison of zimaOS and casaOS interfaces side by side](images/os-comparison.png)
+*Above: Side-by-side comparison of zimaOS (left) and casaOS (right) dashboards*
+
 [Back to Top](#table-of-contents)
 
 ## Hardware Requirements
@@ -55,6 +58,9 @@ Before we begin, make sure you have the following:
 - A computer with internet access to download the OS images
 - Basic knowledge of how to access your router settings
 
+![Hardware setup for server installation](images/hardware-setup.png)
+*Above: Typical hardware setup for a home server installation*
+
 [Back to Top](#table-of-contents)
 
 ## Setting Up zimaOS
@@ -66,6 +72,9 @@ Before we begin, make sure you have the following:
 2. Insert your USB flash drive into your computer
 3. Download and install Etcher (https://etcher.io) to create a bootable USB
 4. Open Etcher, select the zimaOS image file, select your USB drive, and click "Flash"
+
+![Etcher flashing zimaOS image to USB](images/zimaos-etcher.png)
+*Above: Etcher being used to flash the zimaOS image to a USB drive*
 
 #### Step 2: Boot Mac Mini from USB
 1. Connect keyboard, mouse, and monitor to your Mac Mini
@@ -81,6 +90,9 @@ Before we begin, make sure you have the following:
 5. Create an administrator account when prompted
 6. Complete the installation and allow the system to reboot
 
+![zimaOS installation wizard](images/zimaos-install.png)
+*Above: zimaOS installation wizard showing disk selection*
+
 #### Step 4: Initial Configuration
 1. When zimaOS boots for the first time, open a web browser on another device
 2. Navigate to http://zimaos.local or find the IP address from your router
@@ -91,11 +103,17 @@ Before we begin, make sure you have the following:
    - Enable automatic updates
    - Configure storage settings
 
+![zimaOS first login screen](images/zimaos-login.png)
+*Above: zimaOS first login screen after installation*
+
 #### Step 5: Enable Services
 1. From the zimaOS dashboard, navigate to "Services"
 2. Enable the services you need (file sharing, media server, etc.)
 3. Configure each service according to your needs
 4. Set up user accounts for family members if needed
+
+![zimaOS services dashboard](images/zimaos-services.png)
+*Above: zimaOS services configuration panel*
 
 [Back to Top](#table-of-contents)
 
@@ -112,10 +130,16 @@ Before we begin, make sure you have the following:
 8. Set hostname, enable SSH, configure WiFi (if not using Ethernet), and set locale settings
 9. Click "Write" to flash the image to the microSD card
 
+![Raspberry Pi Imager with zimaOS](images/zimaos-pi-imager.png)
+*Above: Raspberry Pi Imager showing custom OS selection for zimaOS*
+
 #### Step 2: Set Up Raspberry Pi
 1. Insert the microSD card into your Raspberry Pi
 2. Connect the Ethernet cable (or rely on the WiFi settings you configured)
 3. Connect the power supply to boot the Raspberry Pi
+
+![Raspberry Pi hardware setup](images/pi-setup.png)
+*Above: Raspberry Pi hardware setup with microSD and connections*
 
 #### Step 3: Access zimaOS Dashboard
 1. Wait about 2 minutes for the Raspberry Pi to boot completely
@@ -131,11 +155,17 @@ Before we begin, make sure you have the following:
 3. Configure your timezone and regional settings
 4. Set up automatic updates
 
+![zimaOS Pi dashboard](images/zimaos-pi-dashboard.png)
+*Above: zimaOS dashboard running on Raspberry Pi*
+
 #### Step 5: Configure Storage
 1. Navigate to "Storage" in the dashboard
 2. If you have external drives, connect them to the Raspberry Pi's USB ports
 3. Format and mount the external drives as needed
 4. Configure sharing permissions
+
+![zimaOS storage configuration](images/zimaos-storage.png)
+*Above: zimaOS storage configuration panel*
 
 [Back to Top](#table-of-contents)
 
@@ -151,6 +181,9 @@ Before we begin, make sure you have the following:
 #### Step 2: Download and Create Installation Media
 1. Download the zimaOS x86-64 image from the official website
 2. Create a bootable USB drive using Etcher or Rufus (https://rufus.ie)
+
+![Rufus creating zimaOS bootable USB](images/zimaos-rufus.png)
+*Above: Rufus creating a bootable USB drive with zimaOS*
 
 #### Step 3: Boot and Install
 1. Connect keyboard, mouse, and monitor to your mini computer
@@ -171,11 +204,17 @@ Before we begin, make sure you have the following:
    - Configure time zone
    - Enable automatic updates
 
+![zimaOS setup wizard](images/zimaos-setup-wizard.png)
+*Above: zimaOS initial setup wizard*
+
 #### Step 5: Optimize for Your Hardware
 1. Navigate to "System" → "Settings" → "Hardware"
 2. Enable hardware acceleration if available for your device
 3. Configure power management settings
 4. Set up fan control if applicable
+
+![zimaOS hardware settings](images/zimaos-hardware-settings.png)
+*Above: zimaOS hardware optimization settings*
 
 [Back to Top](#table-of-contents)
 
@@ -197,6 +236,9 @@ Before we begin, make sure you have the following:
    brew install curl wget git
    ```
 
+![Terminal with Homebrew installation](images/casaos-terminal.png)
+*Above: Terminal showing Homebrew installation on Mac Mini*
+
 #### Step 3: Install casaOS
 1. In Terminal, run the casaOS installation script:
    ```bash
@@ -206,10 +248,16 @@ Before we begin, make sure you have the following:
 3. The installation will take several minutes to complete
 4. When finished, you'll see a success message with the URL to access casaOS
 
+![casaOS installation in Terminal](images/casaos-installation.png)
+*Above: casaOS installation progress in Terminal*
+
 #### Step 4: Access casaOS Dashboard
 1. Open a web browser on any device connected to the same network
 2. Navigate to http://mac-mini.local:80 or use the IP address provided during installation
 3. If you see a browser security warning, proceed anyway (this is due to the self-signed certificate)
+
+![casaOS login screen](images/casaos-login.png)
+*Above: casaOS login screen in web browser*
 
 #### Step 5: Initial Setup
 1. Create your casaOS administrator account
@@ -229,6 +277,9 @@ Before we begin, make sure you have the following:
    - Home Assistant (home automation)
    - Transmission (torrent client)
 
+![casaOS App Store](images/casaos-appstore.png)
+*Above: casaOS App Store showing available applications*
+
 [Back to Top](#table-of-contents)
 
 ### casaOS on Raspberry Pi
@@ -238,6 +289,9 @@ Before we begin, make sure you have the following:
 2. During setup, enable SSH and configure WiFi if needed
 3. Boot your Raspberry Pi with the prepared microSD card
 4. Connect to your Raspberry Pi via SSH or connect a monitor and keyboard
+
+![Raspberry Pi OS Imager](images/raspi-imager.png)
+*Above: Raspberry Pi Imager with OS selection*
 
 #### Step 2: Update System
 1. Update package lists and upgrade existing packages:
@@ -257,6 +311,9 @@ Before we begin, make sure you have the following:
 2. The installation will take 5-10 minutes depending on your Raspberry Pi model and internet speed
 3. When completed, the terminal will display the access URL and default credentials
 
+![casaOS installation on Pi](images/casaos-pi-install.png)
+*Above: casaOS installation process on Raspberry Pi*
+
 #### Step 4: Access casaOS
 1. From another device on your network, open a web browser
 2. Navigate to http://raspberrypi.local:80 or use the IP address shown in the installation output
@@ -269,6 +326,9 @@ Before we begin, make sure you have the following:
    - Navigate to "Storage" in the dashboard
    - Mount any external drives
    - Set up storage pools if needed
+
+![casaOS dashboard on Pi](images/casaos-pi-dashboard.png)
+*Above: casaOS dashboard running on Raspberry Pi*
 
 #### Step 6: Optimize for Raspberry Pi
 1. Install lightweight versions of apps when available
@@ -283,6 +343,9 @@ Before we begin, make sure you have the following:
    arm_freq=1750
    ```
 
+![casaOS system monitor](images/casaos-pi-monitor.png)
+*Above: casaOS system monitor showing resource usage*
+
 [Back to Top](#table-of-contents)
 
 ### casaOS on Other Mini Computers
@@ -293,6 +356,9 @@ Before we begin, make sure you have the following:
    ```bash
    sudo apt update && sudo apt upgrade -y
    ```
+
+![Ubuntu Server installation](images/ubuntu-server.png)
+*Above: Ubuntu Server installation process*
 
 #### Step 2: Install casaOS
 1. Open a terminal and run:
@@ -311,6 +377,9 @@ Before we begin, make sure you have the following:
 3. Complete the initial setup wizard
 4. Create an administrator account
 
+![casaOS initial setup](images/casaos-setup.png)
+*Above: casaOS initial setup wizard*
+
 #### Step 4: Hardware-Specific Optimizations
 1. For Intel NUC or similar mini PCs:
    - Enable hardware acceleration in casaOS settings
@@ -325,6 +394,9 @@ Before we begin, make sure you have the following:
 3. Configure sharing permissions
 4. Set up backup schedules if needed
 
+![casaOS storage management](images/casaos-storage.png)
+*Above: casaOS storage management interface*
+
 [Back to Top](#table-of-contents)
 
 ## Common Use Cases
@@ -335,11 +407,17 @@ Before we begin, make sure you have the following:
 3. Set up libraries for Movies, TV Shows, Music, etc.
 4. Configure remote access if you want to stream outside your home
 
+![Plex Media Server in casaOS](images/plex-setup.png)
+*Above: Plex Media Server running through casaOS*
+
 ### Personal Cloud Storage
 1. Install NextCloud or Seafile from the app store
 2. Set up user accounts for family members
 3. Configure automatic backup from phones and computers
 4. Set storage quotas if needed
+
+![NextCloud in zimaOS](images/nextcloud.png)
+*Above: NextCloud personal cloud storage running on zimaOS*
 
 ### Home Automation Hub
 1. Install Home Assistant or openHAB
@@ -347,17 +425,26 @@ Before we begin, make sure you have the following:
 3. Set up automation routines
 4. Configure remote access securely
 
+![Home Assistant dashboard](images/home-assistant.png)
+*Above: Home Assistant dashboard for smart home control*
+
 ### Network-wide Ad Blocker
 1. Install Pi-hole or AdGuard Home
 2. Configure your router to use your server as DNS
 3. Customize blocklists
 4. Monitor statistics to see blocked ads
 
+![Pi-hole dashboard](images/pihole.png)
+*Above: Pi-hole dashboard showing blocked ads statistics*
+
 ### Game Server
 1. Install game server applications like Minecraft Server
 2. Configure server settings
 3. Set up port forwarding on your router
 4. Create backup schedules
+
+![Minecraft server running on casaOS](images/minecraft-server.png)
+*Above: Minecraft server configuration in casaOS*
 
 [Back to Top](#table-of-contents)
 
@@ -370,6 +457,9 @@ Before we begin, make sure you have the following:
 2. Verify network connectivity
 3. Try accessing via IP address instead of hostname
 4. Wait 5 minutes and try again (initial boot can take time)
+
+![zimaOS network diagnostics](images/zimaos-network.png)
+*Above: zimaOS network diagnostics tool*
 
 #### Storage Not Mounting
 1. Check physical connections
@@ -386,6 +476,9 @@ Before we begin, make sure you have the following:
 3. Consider hardware upgrade if needed
 4. Check for overheating
 
+![zimaOS system monitor](images/zimaos-system-monitor.png)
+*Above: zimaOS system monitor showing resource usage*
+
 ### Common casaOS Issues
 
 #### Installation Fails
@@ -397,6 +490,9 @@ Before we begin, make sure you have the following:
    cd CasaOS
    ./build/scripts/setup/setup.sh
    ```
+
+![casaOS manual installation](images/casaos-manual-install.png)
+*Above: Manual installation of casaOS from GitHub*
 
 #### Apps Won't Install
 1. Check disk space with:
@@ -411,6 +507,9 @@ Before we begin, make sure you have the following:
    ```bash
    sudo docker system prune -a
    ```
+
+![Docker management in casaOS](images/docker-management.png)
+*Above: Docker container management in casaOS*
 
 #### Network Issues
 1. Check if ports are open with:
@@ -433,6 +532,9 @@ Before we begin, make sure you have the following:
    sudo journalctl -u casaos
    ```
 
+![casaOS update screen](images/casaos-update.png)
+*Above: casaOS system update interface*
+
 [Back to Top](#table-of-contents)
 
 ## Conclusion
@@ -452,6 +554,9 @@ As you become more comfortable with your home server, you can explore more advan
 - Hardware expansions
 
 If you have questions or need help, check out the zimaOS and casaOS community forums or GitHub repositories.
+
+![Server setup complete](images/server-complete.png)
+*Above: A complete home server setup running multiple services*
 
 Happy self-hosting!
 
