@@ -1,153 +1,458 @@
-Let me fix the timestamp error. The issue is with how I formatted the timestamp input. Here's the corrected version:
+# Complete Guide to Setting Up Servers with zimaOS and casaOS
 
-```pinescript
-//@version=5
-strategy("Enhanced MTF MA Crossover Strategy", overlay=true, initial_capital=10000, currency=currency.USD, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+## Table of Contents
+- [Introduction](#introduction)
+- [Hardware Requirements](#hardware-requirements)
+- [Setting Up zimaOS](#setting-up-zimaos)
+  - [zimaOS on Mac Mini](#zimaos-on-mac-mini)
+  - [zimaOS on Raspberry Pi](#zimaos-on-raspberry-pi)
+  - [zimaOS on Other Mini Computers](#zimaos-on-other-mini-computers)
+- [Setting Up casaOS](#setting-up-casaos)
+  - [casaOS on Mac Mini](#casaos-on-mac-mini)
+  - [casaOS on Raspberry Pi](#casaos-on-raspberry-pi)
+  - [casaOS on Other Mini Computers](#casaos-on-other-mini-computers)
+- [Common Use Cases](#common-use-cases)
+- [Troubleshooting](#troubleshooting)
+- [Conclusion](#conclusion)
 
-// === INPUTS ===
-shortLen = input.int(9, title="Short MA Length", minval=5, maxval=50, step=1)
-longLen = input.int(21, title="Long MA Length", minval=15, maxval=100, step=1)
-htf = input.timeframe("240", title="Higher Timeframe")
-dailyTF = input.timeframe("D", title="Daily Timeframe")
+## Introduction
 
-// MA Type Selection
-maTypeInput = input.string("EMA", title="MA Type", options=["SMA", "EMA", "WMA", "VWMA"])
+This guide walks you through setting up home servers using two popular operating systems: zimaOS and casaOS. These lightweight server operating systems are perfect for creating home media servers, personal cloud storage, home automation hubs, and more.
 
-// Risk Management
-useStopLoss = input.bool(true, title="Use Stop Loss")
-stopLossPerc = input.float(2.0, title="Stop Loss %", minval=0.5, maxval=10, step=0.5)
-useTakeProfit = input.bool(true, title="Use Take Profit")
-takeProfitPerc = input.float(3.0, title="Take Profit %", minval=1.0, maxval=20, step=0.5)
-useTrailingStop = input.bool(true, title="Use Trailing Stop")
-trailPerc = input.float(1.5, title="Trailing Stop %", minval=0.5, maxval=10, step=0.5)
+Each system has its own advantages:
+- **zimaOS**: Focused on simplicity and ease of use, great for beginners
+- **casaOS**: More feature-rich with a modular app store approach
 
-// Advanced Filters
-useVolume = input.bool(true, title="Volume Filter")
-volumeThreshold = input.float(1.5, title="Volume Threshold (× Avg)", minval=1.0, maxval=5.0, step=0.1)
-useATR = input.bool(true, title="ATR Filter")
-atrPeriod = input.int(14, title="ATR Period", minval=5, maxval=50)
-atrMultiplier = input.float(1.0, title="ATR Multiplier", minval=0.5, maxval=3.0, step=0.1)
+This guide is designed for beginners with minimal technical knowledge. We'll cover installation and basic configuration on different hardware platforms.
 
-// Trade Times - Fixed timestamp format
-useTimeFilter = input.bool(false, title="Filter By Time")
-startHour = input.int(9, "Start Hour", minval=0, maxval=23)
-startMinute = input.int(30, "Start Minute", minval=0, maxval=59)
-endHour = input.int(16, "End Hour", minval=0, maxval=23)
-endMinute = input.int(0, "End Minute", minval=0, maxval=59)
+[Back to Top](#table-of-contents)
 
-// === FUNCTION TO CALCULATE MA BASED ON TYPE ===
-calcMA(src, len, maType) =>
-    result = 0.0
-    if maType == "SMA"
-        result := ta.sma(src, len)
-    else if maType == "EMA" 
-        result := ta.ema(src, len)
-    else if maType == "WMA"
-        result := ta.wma(src, len)
-    else if maType == "VWMA"
-        result := ta.vwma(src, len)
-    else
-        result := ta.sma(src, len)
-    result
+## Hardware Requirements
 
-// === CURRENT TIMEFRAME SIGNALS ===
-maShort = calcMA(close, shortLen, maTypeInput)
-maLong = calcMA(close, longLen, maTypeInput)
-signalCurrent = maShort > maLong ? 1 : maShort < maLong ? -1 : 0
+Before we begin, make sure you have the following:
 
-// === HIGHER TIMEFRAME SIGNALS ===
-htf_maShort = request.security(syminfo.tickerid, htf, calcMA(close, shortLen, maTypeInput), barmerge.gaps_off)
-htf_maLong = request.security(syminfo.tickerid, htf, calcMA(close, longLen, maTypeInput), barmerge.gaps_off)
-signalHTF = htf_maShort > htf_maLong ? 1 : htf_maShort < htf_maLong ? -1 : 0
+### For Mac Mini Setup:
+- A Mac Mini (2010 or newer)
+- USB flash drive (8GB or larger)
+- Ethernet cable or WiFi connectivity
+- External keyboard, mouse, and monitor (for initial setup)
 
-// === DAILY TIMEFRAME SIGNALS ===
-daily_maShort = request.security(syminfo.tickerid, dailyTF, calcMA(close, shortLen, maTypeInput), barmerge.gaps_off)
-daily_maLong = request.security(syminfo.tickerid, dailyTF, calcMA(close, longLen, maTypeInput), barmerge.gaps_off)
-signalDaily = daily_maShort > daily_maLong ? 1 : daily_maShort < daily_maLong ? -1 : 0
+### For Raspberry Pi Setup:
+- Raspberry Pi 4 (2GB RAM or more recommended)
+- microSD card (16GB or larger, Class 10)
+- Raspberry Pi power supply
+- Ethernet cable or WiFi connectivity
+- Optional: case for the Raspberry Pi
 
-// === ADDITIONAL FILTERS ===
-// Volume Filter
-avgVolume = ta.sma(volume, 20)
-volumeOK = not useVolume or volume >= avgVolume * volumeThreshold
+### For Other Mini Computers:
+- Any x86-64 mini PC (Intel or AMD)
+- 2GB RAM minimum (4GB recommended)
+- 16GB storage minimum (SSD preferred)
+- Ethernet port or WiFi adapter
 
-// ATR Filter
-atr = ta.atr(atrPeriod)
-atrFilter = not useATR or (math.abs(ta.change(close)) >= atr * atrMultiplier)
+### Additional Items:
+- External storage drive (recommended for media storage)
+- A computer with internet access to download the OS images
+- Basic knowledge of how to access your router settings
 
-// Time Filter - Using direct hour and minute comparison
-timeOK = true
-if useTimeFilter
-    t = time("", "1")
-    currentHour = hour(t)
-    currentMinute = minute(t)
-    currentTime = currentHour * 100 + currentMinute
-    startTime = startHour * 100 + startMinute
-    endTime = endHour * 100 + endMinute
-    timeOK := currentTime >= startTime and currentTime <= endTime
+[Back to Top](#table-of-contents)
 
-// Trend Strength
-trendStrength = math.abs(maShort - maLong) / maLong * 100
-strongTrend = trendStrength > 0.5
+## Setting Up zimaOS
 
-// === COMBINE SIGNALS WITH IMPROVED WEIGHTING ===
-dailyWeight = 2.0  // Give more weight to daily timeframe
-htfWeight = 1.5   // Give moderate weight to higher timeframe
-finalSignal = signalCurrent + (signalHTF * htfWeight) + (signalDaily * dailyWeight)
+### zimaOS on Mac Mini
 
-// Confirmation Logic
-buySignal = finalSignal >= 3 and volumeOK and atrFilter and timeOK and strongTrend
-sellSignal = finalSignal <= -3 and volumeOK and atrFilter and timeOK and strongTrend
+#### Step 1: Download and Prepare Installation Media
+1. Visit the zimaOS website (https://zimaos.com) and download the latest version
+2. Insert your USB flash drive into your computer
+3. Download and install Etcher (https://etcher.io) to create a bootable USB
+4. Open Etcher, select the zimaOS image file, select your USB drive, and click "Flash"
 
-// === STRATEGY ENTRIES WITH RISK MANAGEMENT ===
-if buySignal
-    stopLevel = useStopLoss ? close * (1 - stopLossPerc/100) : na
-    profitLevel = useTakeProfit ? close * (1 + takeProfitPerc/100) : na
-    
-    strategy.entry("Long", strategy.long)
-    
-    if useStopLoss
-        strategy.exit("SL/TP", "Long", stop=stopLevel, limit=profitLevel)
-    
-    if useTrailingStop
-        strategy.exit("Trail", "Long", trail_points=close * trailPerc/100 * syminfo.pointvalue, trail_offset=0)
-    
-    label.new(bar_index, low, "BUY", color=color.green, textcolor=color.white, size=size.tiny)
+#### Step 2: Boot Mac Mini from USB
+1. Connect keyboard, mouse, and monitor to your Mac Mini
+2. Insert the prepared USB drive
+3. Power on the Mac Mini while holding the Option (⌥) key
+4. When the boot menu appears, select the USB drive
 
-if sellSignal
-    stopLevel = useStopLoss ? close * (1 + stopLossPerc/100) : na
-    profitLevel = useTakeProfit ? close * (1 - takeProfitPerc/100) : na
-    
-    strategy.entry("Short", strategy.short)
-    
-    if useStopLoss
-        strategy.exit("SL/TP", "Short", stop=stopLevel, limit=profitLevel)
-    
-    if useTrailingStop
-        strategy.exit("Trail", "Short", trail_points=close * trailPerc/100 * syminfo.pointvalue, trail_offset=0)
-    
-    label.new(bar_index, high, "SELL", color=color.red, textcolor=color.white, size=size.tiny)
+#### Step 3: Install zimaOS
+1. Follow the on-screen installation wizard
+2. Select your language and region
+3. When prompted for installation location, select the Mac Mini's internal drive
+4. **WARNING**: This will erase all data on the Mac Mini
+5. Create an administrator account when prompted
+6. Complete the installation and allow the system to reboot
 
-// === PLOTTING ===
-plot(maShort, color=color.blue, title="Short MA", linewidth=2)
-plot(maLong, color=color.red, title="Long MA", linewidth=2)
+#### Step 4: Initial Configuration
+1. When zimaOS boots for the first time, open a web browser on another device
+2. Navigate to http://zimaos.local or find the IP address from your router
+3. Log in with the administrator credentials you created during installation
+4. Complete the initial setup wizard:
+   - Set up network configuration
+   - Configure time zone settings
+   - Enable automatic updates
+   - Configure storage settings
 
-// === MARKING SIGNALS ON CHART ===
-plotshape(buySignal, title="Buy Signal", location=location.belowbar, color=color.green, style=shape.labelup, size=size.small)
-plotshape(sellSignal, title="Sell Signal", location=location.abovebar, color=color.red, style=shape.labeldown, size=size.small)
+#### Step 5: Enable Services
+1. From the zimaOS dashboard, navigate to "Services"
+2. Enable the services you need (file sharing, media server, etc.)
+3. Configure each service according to your needs
+4. Set up user accounts for family members if needed
 
-// === ALERTS ===
-alertcondition(buySignal, title="Buy Alert", message="Buy Signal Triggered!")
-alertcondition(sellSignal, title="Sell Alert", message="Sell Signal Triggered!")
+[Back to Top](#table-of-contents)
 
-```
+### zimaOS on Raspberry Pi
 
-I've fixed the timestamp error by:
+#### Step 1: Download and Flash zimaOS
+1. Visit the zimaOS website and download the Raspberry Pi image
+2. Insert your microSD card into your computer using an adapter if necessary
+3. Download and install Raspberry Pi Imager (https://www.raspberrypi.org/software/)
+4. Open Raspberry Pi Imager
+5. Click "Choose OS" and select "Use custom" to locate your downloaded zimaOS image
+6. Click "Choose Storage" and select your microSD card
+7. Click the gear icon to open advanced options
+8. Set hostname, enable SSH, configure WiFi (if not using Ethernet), and set locale settings
+9. Click "Write" to flash the image to the microSD card
 
-1. Completely removing the `timestamp()` and `input.time()` functions that were causing the error
-2. Replacing them with simple numeric hour and minute inputs 
-3. Using a time calculation method that works with standard PineScript functions:
-   - Using `hour()` and `minute()` functions to get current bar time
-   - Converting time to a numeric format (HHMM) that's easy to compare
-   - Default session is set to 9:30 AM - 4:00 PM (common market hours)
+#### Step 2: Set Up Raspberry Pi
+1. Insert the microSD card into your Raspberry Pi
+2. Connect the Ethernet cable (or rely on the WiFi settings you configured)
+3. Connect the power supply to boot the Raspberry Pi
 
-This approach to time filtering is much more compatible with PineScript and should compile without timestamp-related errors. The strategy's core logic remains intact with all the key improvements to help reduce losses and increase profitability.
+#### Step 3: Access zimaOS Dashboard
+1. Wait about 2 minutes for the Raspberry Pi to boot completely
+2. From another device on the same network, open a web browser
+3. Navigate to http://zimaos.local or find the IP address from your router
+4. If prompted, log in with the default credentials:
+   - Username: admin
+   - Password: zimaos
+
+#### Step 4: Complete Initial Setup
+1. Follow the on-screen setup wizard
+2. Change the default password when prompted
+3. Configure your timezone and regional settings
+4. Set up automatic updates
+
+#### Step 5: Configure Storage
+1. Navigate to "Storage" in the dashboard
+2. If you have external drives, connect them to the Raspberry Pi's USB ports
+3. Format and mount the external drives as needed
+4. Configure sharing permissions
+
+[Back to Top](#table-of-contents)
+
+### zimaOS on Other Mini Computers
+
+#### Step 1: Check Compatibility
+1. Ensure your mini computer meets the minimum requirements:
+   - x86-64 processor
+   - 2GB RAM minimum
+   - 16GB storage
+   - UEFI boot support
+
+#### Step 2: Download and Create Installation Media
+1. Download the zimaOS x86-64 image from the official website
+2. Create a bootable USB drive using Etcher or Rufus (https://rufus.ie)
+
+#### Step 3: Boot and Install
+1. Connect keyboard, mouse, and monitor to your mini computer
+2. Enter BIOS/UEFI settings (usually by pressing F2, F10, or Delete during boot)
+3. Set the USB drive as the first boot device
+4. Save changes and reboot
+5. Follow the zimaOS installation wizard
+6. Select your language and region
+7. Choose the internal storage as the installation target
+8. Create an administrator account
+
+#### Step 4: First Boot Configuration
+1. After installation completes, the system will reboot
+2. Access the zimaOS interface via http://zimaos.local or via IP address
+3. Complete the initial setup wizard:
+   - Configure network settings
+   - Set up storage
+   - Configure time zone
+   - Enable automatic updates
+
+#### Step 5: Optimize for Your Hardware
+1. Navigate to "System" → "Settings" → "Hardware"
+2. Enable hardware acceleration if available for your device
+3. Configure power management settings
+4. Set up fan control if applicable
+
+[Back to Top](#table-of-contents)
+
+## Setting Up casaOS
+
+### casaOS on Mac Mini
+
+#### Step 1: Prepare Your Mac Mini
+1. Back up any important data on your Mac Mini
+2. Make sure your Mac Mini is connected to the internet
+3. If possible, use a wired Ethernet connection for stability
+
+#### Step 2: Install Required Software
+1. On your Mac Mini, open Terminal (Applications → Utilities → Terminal)
+2. Update and install required packages by typing:
+   ```bash
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   brew update
+   brew install curl wget git
+   ```
+
+#### Step 3: Install casaOS
+1. In Terminal, run the casaOS installation script:
+   ```bash
+   curl -fsSL https://get.casaos.io | sudo bash
+   ```
+2. When prompted, enter your Mac administrator password
+3. The installation will take several minutes to complete
+4. When finished, you'll see a success message with the URL to access casaOS
+
+#### Step 4: Access casaOS Dashboard
+1. Open a web browser on any device connected to the same network
+2. Navigate to http://mac-mini.local:80 or use the IP address provided during installation
+3. If you see a browser security warning, proceed anyway (this is due to the self-signed certificate)
+
+#### Step 5: Initial Setup
+1. Create your casaOS administrator account
+2. Set a secure password
+3. Complete the setup wizard:
+   - Set up system preferences
+   - Configure storage locations
+   - Set up user access controls
+
+#### Step 6: Install Apps
+1. Navigate to the "App Store" in the casaOS dashboard
+2. Browse available applications
+3. Click "Install" on any apps you want to use
+4. Popular starter apps include:
+   - Plex Media Server
+   - NextCloud (personal cloud storage)
+   - Home Assistant (home automation)
+   - Transmission (torrent client)
+
+[Back to Top](#table-of-contents)
+
+### casaOS on Raspberry Pi
+
+#### Step 1: Prepare Raspberry Pi OS
+1. Download and install Raspberry Pi OS Lite (64-bit recommended) using Raspberry Pi Imager
+2. During setup, enable SSH and configure WiFi if needed
+3. Boot your Raspberry Pi with the prepared microSD card
+4. Connect to your Raspberry Pi via SSH or connect a monitor and keyboard
+
+#### Step 2: Update System
+1. Update package lists and upgrade existing packages:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+2. Install dependencies:
+   ```bash
+   sudo apt install -y curl wget git
+   ```
+
+#### Step 3: Install casaOS
+1. Run the casaOS installation script:
+   ```bash
+   curl -fsSL https://get.casaos.io | sudo bash
+   ```
+2. The installation will take 5-10 minutes depending on your Raspberry Pi model and internet speed
+3. When completed, the terminal will display the access URL and default credentials
+
+#### Step 4: Access casaOS
+1. From another device on your network, open a web browser
+2. Navigate to http://raspberrypi.local:80 or use the IP address shown in the installation output
+3. If the page doesn't load, wait a few more minutes as the services may still be starting
+
+#### Step 5: Configure casaOS
+1. Create your administrator account
+2. Set your timezone and language preferences
+3. Configure storage:
+   - Navigate to "Storage" in the dashboard
+   - Mount any external drives
+   - Set up storage pools if needed
+
+#### Step 6: Optimize for Raspberry Pi
+1. Install lightweight versions of apps when available
+2. Monitor system resources in the dashboard
+3. Consider setting up overclocking if you're comfortable with it (for advanced users):
+   ```bash
+   sudo nano /boot/config.txt
+   ```
+   Add these lines for a modest overclock on Pi 4:
+   ```
+   over_voltage=2
+   arm_freq=1750
+   ```
+
+[Back to Top](#table-of-contents)
+
+### casaOS on Other Mini Computers
+
+#### Step 1: Install Linux
+1. Install a compatible Linux distribution (Ubuntu Server 20.04 or newer recommended)
+2. Make sure the system is up to date:
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
+
+#### Step 2: Install casaOS
+1. Open a terminal and run:
+   ```bash
+   curl -fsSL https://get.casaos.io | sudo bash
+   ```
+2. Follow the on-screen instructions
+3. Wait for installation to complete (approximately 5-15 minutes)
+
+#### Step 3: Access and Configure
+1. Find your device's IP address:
+   ```bash
+   ip addr show | grep inet
+   ```
+2. From another device, open a web browser and navigate to http://[YOUR-IP-ADDRESS]:80
+3. Complete the initial setup wizard
+4. Create an administrator account
+
+#### Step 4: Hardware-Specific Optimizations
+1. For Intel NUC or similar mini PCs:
+   - Enable hardware acceleration in casaOS settings
+   - Configure wake-on-LAN if desired
+2. For ARM-based mini computers:
+   - Choose ARM-compatible apps from the app store
+   - Monitor CPU temperature and set up cooling as needed
+
+#### Step 5: Set Up Storage
+1. Navigate to "Storage" in the casaOS dashboard
+2. Format and mount any additional drives
+3. Configure sharing permissions
+4. Set up backup schedules if needed
+
+[Back to Top](#table-of-contents)
+
+## Common Use Cases
+
+### Media Server Setup
+1. Install media server software like Plex, Jellyfin, or Emby from the app store
+2. Configure your media folders in the app settings
+3. Set up libraries for Movies, TV Shows, Music, etc.
+4. Configure remote access if you want to stream outside your home
+
+### Personal Cloud Storage
+1. Install NextCloud or Seafile from the app store
+2. Set up user accounts for family members
+3. Configure automatic backup from phones and computers
+4. Set storage quotas if needed
+
+### Home Automation Hub
+1. Install Home Assistant or openHAB
+2. Connect compatible smart home devices
+3. Set up automation routines
+4. Configure remote access securely
+
+### Network-wide Ad Blocker
+1. Install Pi-hole or AdGuard Home
+2. Configure your router to use your server as DNS
+3. Customize blocklists
+4. Monitor statistics to see blocked ads
+
+### Game Server
+1. Install game server applications like Minecraft Server
+2. Configure server settings
+3. Set up port forwarding on your router
+4. Create backup schedules
+
+[Back to Top](#table-of-contents)
+
+## Troubleshooting
+
+### Common zimaOS Issues
+
+#### Dashboard Not Loading
+1. Check if your server is powered on
+2. Verify network connectivity
+3. Try accessing via IP address instead of hostname
+4. Wait 5 minutes and try again (initial boot can take time)
+
+#### Storage Not Mounting
+1. Check physical connections
+2. Verify drive format (should be ext4, NTFS, or exFAT)
+3. Try mounting manually via command line:
+   ```bash
+   sudo mount /dev/sdX /mnt/yourdrive
+   ```
+4. Check drive health with SMART tools
+
+#### Performance Issues
+1. Check CPU and RAM usage in dashboard
+2. Reduce number of running services
+3. Consider hardware upgrade if needed
+4. Check for overheating
+
+### Common casaOS Issues
+
+#### Installation Fails
+1. Verify internet connection
+2. Check system requirements
+3. Try installation with the alternative method:
+   ```bash
+   git clone https://github.com/IceWhaleTech/CasaOS.git
+   cd CasaOS
+   ./build/scripts/setup/setup.sh
+   ```
+
+#### Apps Won't Install
+1. Check disk space with:
+   ```bash
+   df -h
+   ```
+2. Restart Docker service:
+   ```bash
+   sudo systemctl restart docker
+   ```
+3. Clear Docker cache:
+   ```bash
+   sudo docker system prune -a
+   ```
+
+#### Network Issues
+1. Check if ports are open with:
+   ```bash
+   sudo netstat -tulpn | grep LISTEN
+   ```
+2. Verify firewall settings:
+   ```bash
+   sudo ufw status
+   ```
+3. Check Docker network settings
+
+#### Update Problems
+1. Manually update casaOS:
+   ```bash
+   curl -fsSL https://get.casaos.io/update | sudo bash
+   ```
+2. Check logs for errors:
+   ```bash
+   sudo journalctl -u casaos
+   ```
+
+[Back to Top](#table-of-contents)
+
+## Conclusion
+
+Congratulations! You now have a fully functioning home server running either zimaOS or casaOS. These versatile platforms can serve a wide range of purposes, from media streaming to home automation.
+
+Remember to:
+- Keep your system updated regularly
+- Back up important configurations and data
+- Secure your server with strong passwords
+- Consider setting up automatic backups
+
+As you become more comfortable with your home server, you can explore more advanced features like:
+- VPN setup for remote access
+- Custom Docker containers
+- Advanced networking configurations
+- Hardware expansions
+
+If you have questions or need help, check out the zimaOS and casaOS community forums or GitHub repositories.
+
+Happy self-hosting!
+
+[Back to Top](#table-of-contents)
